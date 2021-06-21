@@ -13,17 +13,24 @@ export const init = () => {
         throw err;
       }
 
-      const queue = 'DURABLE_QUEUE';
+      const exchange = 'logs_exchange';
 
-      channel.assertQueue(queue, {
-        durable: true,
+      channel.assertExchange(exchange, 'fanout', {
+        durable: false,
       });
 
       channel.prefetch(1);
 
-      channel.consume(
-        queue,
-        (message) => {
+      channel.assertQueue('', { exclusive: true }, (error, queue) => {
+        if (error) {
+          throw error;
+        }
+
+        console.log('CONNECTED TO QUEUE "%s"', queue.queue);
+
+        channel.bindQueue(queue.queue, exchange, '');
+
+        channel.consume(queue.queue, (message) => {
           const content = message?.content.toString();
           console.log('\nPROCESSING: "%s"', content);
           setTimeout(() => {
@@ -31,11 +38,8 @@ export const init = () => {
             if (!message) return;
             channel.ack(message);
           }, 1);
-        },
-        {
-          noAck: false,
-        }
-      );
+        });
+      });
     });
   });
 };

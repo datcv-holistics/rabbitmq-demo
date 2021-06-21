@@ -13,15 +13,15 @@ export const init = () => {
         throw err;
       }
 
-      const queue = 'DURABLE_QUEUE';
+      const exchange = 'logs_exchange';
 
-      channel.assertQueue(queue, {
-        durable: true,
+      channel.assertExchange(exchange, 'fanout', {
+        durable: false,
       });
 
       setInterval(() => {
         const message = 'RabbitMQ ' + Math.round(Math.random() * 1000);
-        channel.sendToQueue(queue, Buffer.from(message), { persistent: true });
+        channel.publish(exchange, '', Buffer.from(message));
 
         console.log('SENT MESSAGE "%s"', message);
       }, 1000);
