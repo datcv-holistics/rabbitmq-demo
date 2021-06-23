@@ -13,15 +13,22 @@ export const init = () => {
         throw err;
       }
 
-      const exchange = 'logs_exchange';
+      const exchange = 'logs_exchange_direct';
 
-      channel.assertExchange(exchange, 'fanout', {
+      channel.assertExchange(exchange, 'direct', {
         durable: false,
       });
 
       setInterval(() => {
-        const message = 'RabbitMQ ' + Math.round(Math.random() * 1000);
-        channel.publish(exchange, '', Buffer.from(message));
+        const type =
+          Math.random() > 0.5
+            ? 'warning'
+            : Math.random() > 0.7
+            ? 'error'
+            : 'info';
+        const message =
+          'RabbitMQ ' + type + ' ' + Math.round(Math.random() * 1000);
+        channel.publish(exchange, type, Buffer.from(message));
 
         console.log('SENT MESSAGE "%s"', message);
       }, 1000);

@@ -13,9 +13,9 @@ export const init = () => {
         throw err;
       }
 
-      const exchange = 'logs_exchange';
+      const exchange = 'logs_exchange_direct';
 
-      channel.assertExchange(exchange, 'fanout', {
+      channel.assertExchange(exchange, 'direct', {
         durable: false,
       });
 
@@ -28,7 +28,8 @@ export const init = () => {
 
         console.log('CONNECTED TO QUEUE "%s"', queue.queue);
 
-        channel.bindQueue(queue.queue, exchange, '');
+        channel.bindQueue(queue.queue, exchange, 'error');
+        channel.bindQueue(queue.queue, exchange, 'warning');
 
         channel.consume(queue.queue, (message) => {
           const content = message?.content.toString();
