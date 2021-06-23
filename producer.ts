@@ -13,19 +13,19 @@ export const init = () => {
         throw err;
       }
 
-      const exchange = 'logs_exchange_direct';
+      const exchange = 'logs_exchange_topic';
 
-      channel.assertExchange(exchange, 'direct', {
+      channel.assertExchange(exchange, 'topic', {
         durable: false,
       });
 
       setInterval(() => {
         const type =
           Math.random() > 0.5
-            ? 'warning'
+            ? 'dog.error'
             : Math.random() > 0.7
-            ? 'error'
-            : 'info';
+            ? 'cat.error'
+            : 'dog.info';
         const message =
           'RabbitMQ ' + type + ' ' + Math.round(Math.random() * 1000);
         channel.publish(exchange, type, Buffer.from(message));
