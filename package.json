@@ -8,14 +8,14 @@
   },
   "devDependencies": {
     "@types/amqplib": "^0.8.0",
-    "nodemon": "^2.0.7",
+    "nodemon": "^2.0.20",
     "ts-node": "^10.0.0",
     "typescript": "^4.3.2"
   },
   "scripts": {
-    "start": "nodemon index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:producer": "nodemon src/producer/index.ts",
+    "start:consumer": "nodemon src/consumer/index.ts"
   },
-  "author": "",
+  "author": "cvdat2097",
   "license": "ISC"
 }
