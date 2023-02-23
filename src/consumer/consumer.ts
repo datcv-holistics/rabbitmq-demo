@@ -2,18 +2,14 @@ import amqp from 'amqplib/callback_api';
 
 export const init = () => {
   amqp.connect('amqp://localhost', (err, connection) => {
-    if (err) {
-      throw err;
-    }
+    if (err) throw err;
 
     console.log('CONSUMER CONNECTED');
 
     connection.createChannel((err, channel) => {
-      if (err) {
-        throw err;
-      }
+      if (err) throw err;
 
-      const exchange = 'logs_exchange_topic';
+      const exchange = 'order_topic_exchange';
 
       channel.assertExchange(exchange, 'topic', {
         durable: false,
@@ -22,22 +18,20 @@ export const init = () => {
       channel.prefetch(1);
 
       channel.assertQueue('', { exclusive: true }, (error, queue) => {
-        if (error) {
-          throw error;
-        }
+        if (error) throw error;
 
         console.log('CONNECTED TO QUEUE "%s"', queue.queue);
 
-        channel.bindQueue(queue.queue, exchange, '*.info');
+        channel.bindQueue(queue.queue, exchange, 'vn.order.*');
 
         channel.consume(queue.queue, (message) => {
+          if (!message) return;
+
           const content = message?.content.toString();
-          console.log('\nPROCESSING: "%s"', content);
-          setTimeout(() => {
-            console.log('DONE: "%s"', content);
-            if (!message) return;
-            channel.ack(message);
-          }, 1);
+          
+          console.log('\nReceived Message: "%s"', content);
+
+          channel.ack(message);
         });
       });
     });
